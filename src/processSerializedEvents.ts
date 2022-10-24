@@ -13,6 +13,7 @@ import {
   Worker,
 } from './model'
 import {Ctx, SerializedEvent} from './processor'
+import queryIdentities from './queryIdentities'
 import {
   combineIds,
   getAccount,
@@ -27,6 +28,7 @@ const processSerializedEvents = async (
   ctx: Ctx,
   serializedEvents: SerializedEvent[]
 ): Promise<void> => {
+  const identityUpdatedAccountIds = new Set<string>()
   const stakePoolIds = new Set<string>()
   const workerIds = new Set<string>()
   const minerIds = new Set<string>()
@@ -99,6 +101,14 @@ const processSerializedEvents = async (
       stakePoolWhitelistIds.add(
         combineIds(params.stakePoolId, params.accountId)
       )
+    }
+
+    if (
+      name === 'Identity.IdentitySet' ||
+      name === 'Identity.IdentityCleared' ||
+      name === 'Identity.JudgementGiven'
+    ) {
+      identityUpdatedAccountIds.add(params.accountId)
     }
   }
 
@@ -658,6 +668,13 @@ const processSerializedEvents = async (
     }
   }
 
+  ctx.log.info('Querying account identities for chain storage')
+  await queryIdentities(
+    ctx,
+    Array.from(identityUpdatedAccountIds.values()),
+    accounts
+  )
+  ctx.log.info('Account identities updated')
   await ctx.store.save(Array.from(accounts.values()))
   await ctx.store.save(Array.from(stakePools.values()))
   await ctx.store.save(Array.from(miners.values()))

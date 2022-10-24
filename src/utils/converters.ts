@@ -19,3 +19,6 @@ export const fromBits = (value: JsonBigInt | bigint): BigDecimal =>
 
 export const encodeAddress = (bytes: Uint8Array): string =>
   ss58.codec('phala').encode(bytes)
+
+export const decodeAddress = (address: string): Uint8Array =>
+  ss58.codec('phala').decode(address)

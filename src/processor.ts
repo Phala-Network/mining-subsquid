@@ -61,6 +61,10 @@ const processor = new SubstrateBatchProcessor()
   .addEvent('PhalaRegistry.InitialScoreSet', {data: {event: {args: true}}})
   .addEvent('PhalaRegistry.WorkerAdded', {data: {event: {args: true}}})
   .addEvent('PhalaRegistry.WorkerUpdated', {data: {event: {args: true}}})
+  // Identity
+  .addEvent('Identity.IdentitySet', {data: {event: {args: true}}})
+  .addEvent('Identity.IdentityCleared', {data: {event: {args: true}}})
+  .addEvent('Identity.JudgementGiven', {data: {event: {args: true}}})
 
 type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
@@ -181,6 +185,9 @@ export type BaseSerializedEvent =
       params: {workerId: string; confidenceLevel: number}
     }
   | {name: 'PhalaMining.TokenomicParametersChanged'; params: {}}
+  | {name: 'Identity.IdentitySet'; params: {accountId: string}}
+  | {name: 'Identity.IdentityCleared'; params: {accountId: string}}
+  | {name: 'Identity.JudgementGiven'; params: {accountId: string}}
 
 export type SerializedEvent = {block: SubstrateBlock} & BaseSerializedEvent
 

@@ -18,8 +18,20 @@ type TokenomicParameters @entity {
   k: BigDecimal!
 }
 
+enum IdentityLevel {
+  Unknown
+  FeePaid
+  Reasonable
+  KnownGood
+  OutOfDate
+  LowQuality
+  Erroneous
+}
+
 type Account @entity {
   id: ID! # Account address
+  identityDisplay: String
+  identityLevel: IdentityLevel!
   totalStake: BigDecimal!
   totalStakeReward: BigDecimal!
   totalOwnerReward: BigDecimal!

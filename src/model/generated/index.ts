@@ -1,6 +1,7 @@
 export * from "./globalState.model"
 export * from "./tokenomicParameters.model"
 export * from "./account.model"
+export * from "./_identityLevel"
 export * from "./worker.model"
 export * from "./miner.model"
 export * from "./_minerState"

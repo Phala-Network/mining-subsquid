@@ -1,5 +1,6 @@
 import {BigDecimal} from '@subsquid/big-decimal'
 import {SubstrateBlock} from '@subsquid/substrate-processor'
+import {decodeHex} from '@subsquid/util-internal-hex'
 import assert from 'assert'
 import {readFile} from 'fs/promises'
 import path from 'path'
@@ -7,6 +8,7 @@ import {START_BLOCK_HEIGHT, START_BLOCK_TIMESTAMP} from './constants'
 import {
   Account,
   GlobalState,
+  IdentityLevel,
   Miner,
   MinerState,
   StakePool,
@@ -23,6 +25,23 @@ import {
   updateWorkerSMinAndSMax,
 } from './utils/common'
 import {fromBits, JsonBigInt, toBalance} from './utils/converters'
+
+type IdentityInfo = {raw: string} | {none: null}
+
+interface IdentityDump {
+  judgements:
+    | []
+    | [[0, {[key in 'reasonable' | 'knownGood' | 'feePaid']: null}]]
+  info: {
+    display: IdentityInfo
+    legal: IdentityInfo
+    web: IdentityInfo
+    riot: IdentityInfo
+    email: IdentityInfo
+    image: IdentityInfo
+    twitter: IdentityInfo
+  }
+}
 
 interface StakePoolDump {
   pid: JsonBigInt
@@ -81,6 +100,9 @@ const saveInitialState = async (
     )
     return JSON.parse(file).result
   }
+  const identitiesDump = await readJson<Array<[string, IdentityDump]>>(
+    'identities'
+  )
   const stakePoolsDump = await readJson<StakePoolDump[]>('stake_pools')
   const minersDump = await readJson<{[minerId in string]: MinerDump}>('miners')
   const workersDump = await readJson<WorkerDump[]>('workers')
@@ -140,6 +162,22 @@ const saveInitialState = async (
       }),
     ])
   )
+
+  for (const [accountId, {judgements, info}] of identitiesDump) {
+    const account = getAccount(accounts, accountId)
+    if ('raw' in info.display) {
+      account.identityDisplay = decodeHex(info.display.raw).toString()
+    }
+    if (judgements[0]?.[1] != null) {
+      if ('reasonable' in judgements[0][1]) {
+        account.identityLevel = IdentityLevel.Reasonable
+      } else if ('knownGood' in judgements[0][1]) {
+        account.identityLevel = IdentityLevel.KnownGood
+      } else if ('feePaid' in judgements[0][1]) {
+        account.identityLevel = IdentityLevel.FeePaid
+      }
+    }
+  }
 
   for (const s of stakePoolsDump) {
     const stakePoolId = BigInt(s.pid).toString()

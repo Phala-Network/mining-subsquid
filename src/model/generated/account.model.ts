@@ -1,6 +1,7 @@
 import {BigDecimal} from "@subsquid/big-decimal"
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
+import {IdentityLevel} from "./_identityLevel"
 import {StakePool} from "./stakePool.model"
 import {StakePoolWhitelist} from "./stakePoolWhitelist.model"
 import {StakePoolStake} from "./stakePoolStake.model"
@@ -13,6 +14,12 @@ export class Account {
 
   @PrimaryColumn_()
   id!: string
+
+  @Column_("text", {nullable: true})
+  identityDisplay!: string | undefined | null
+
+  @Column_("varchar", {length: 10, nullable: false})
+  identityLevel!: IdentityLevel
 
   @Column_("numeric", {transformer: marshal.bigdecimalTransformer, nullable: false})
   totalStake!: BigDecimal

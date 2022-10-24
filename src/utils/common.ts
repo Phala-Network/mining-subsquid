@@ -1,13 +1,21 @@
 import {BigDecimal} from '@subsquid/big-decimal'
 import assert from 'assert'
 import {DUST_LIMIT} from '../constants'
-import {Account, Miner, StakePool, TokenomicParameters, Worker} from '../model'
+import {
+  Account,
+  IdentityLevel,
+  Miner,
+  StakePool,
+  TokenomicParameters,
+  Worker,
+} from '../model'
 
 export const getAccount = (m: Map<string, Account>, id: string): Account => {
   let acc = m.get(id)
   if (acc == null) {
     acc = new Account({
       id,
+      identityLevel: IdentityLevel.Unknown,
       totalStake: BigDecimal(0),
       totalOwnerReward: BigDecimal(0),
       totalStakeReward: BigDecimal(0),

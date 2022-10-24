@@ -2,6 +2,9 @@ import {BigDecimal} from '@subsquid/big-decimal'
 import {toHex} from '@subsquid/substrate-processor'
 import {BaseSerializedEvent, Ctx, SerializedEvent} from './processor'
 import {
+  IdentityIdentityClearedEvent,
+  IdentityIdentitySetEvent,
+  IdentityJudgementGivenEvent,
   PhalaMiningBenchmarkUpdatedEvent,
   PhalaMiningMinerBoundEvent,
   PhalaMiningMinerEnterUnresponsiveEvent,
@@ -291,6 +294,21 @@ const serializeEvents = (ctx: Ctx): SerializedEvent[] => {
         baseEvent = {
           name: item.name,
           params: {workerId: toHex(pubkey), initialScore: initScore},
+        }
+      } else if (item.name === 'Identity.IdentitySet') {
+        const e = new IdentityIdentitySetEvent(ctx, item.event)
+        const {who} = e.asV1090
+        baseEvent = {name: item.name, params: {accountId: encodeAddress(who)}}
+      } else if (item.name === 'Identity.IdentityCleared') {
+        const e = new IdentityIdentityClearedEvent(ctx, item.event)
+        const {who} = e.asV1090
+        baseEvent = {name: item.name, params: {accountId: encodeAddress(who)}}
+      } else if (item.name === 'Identity.JudgementGiven') {
+        const e = new IdentityJudgementGivenEvent(ctx, item.event)
+        const {target} = e.asV1090
+        baseEvent = {
+          name: item.name,
+          params: {accountId: encodeAddress(target)},
         }
       }
 

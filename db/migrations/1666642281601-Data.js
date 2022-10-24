@@ -1,5 +1,5 @@
-module.exports = class Data1666433901738 {
-  name = 'Data1666433901738'
+module.exports = class Data1666642281601 {
+  name = 'Data1666642281601'
 
   async up(db) {
     await db.query(`CREATE TABLE "global_state" ("id" character varying NOT NULL, "height" integer NOT NULL, "total_stake" numeric NOT NULL, "last_recorded_block_height" integer NOT NULL, "last_recorded_block_time" TIMESTAMP WITH TIME ZONE NOT NULL, "average_block_time" integer NOT NULL, "mining_worker_share" numeric NOT NULL, CONSTRAINT "PK_8b4db1150cf49bfd067e2572c74" PRIMARY KEY ("id"))`)
@@ -19,7 +19,7 @@ module.exports = class Data1666433901738 {
     await db.query(`CREATE TABLE "stake_pool" ("id" character varying NOT NULL, "pid" numeric NOT NULL, "commission" numeric NOT NULL, "capacity" numeric, "delegable" numeric, "free_stake" numeric NOT NULL, "releasing_stake" numeric NOT NULL, "total_stake" numeric NOT NULL, "total_shares" numeric NOT NULL, "owner_reward" numeric NOT NULL, "active_stake_count" integer NOT NULL, "worker_count" integer NOT NULL, "mining_worker_count" integer NOT NULL, "mining_worker_share" numeric NOT NULL, "apr_base" numeric NOT NULL, "total_withdrawal" numeric NOT NULL, "whitelist_enabled" boolean NOT NULL, "owner_id" character varying, CONSTRAINT "PK_646d137a2979aa231fa880711f3" PRIMARY KEY ("id"))`)
     await db.query(`CREATE UNIQUE INDEX "IDX_c8c9190df77c9651929d6d23e2" ON "stake_pool" ("pid") `)
     await db.query(`CREATE INDEX "IDX_9dc40c97caad68a3c0a6b9ee71" ON "stake_pool" ("owner_id") `)
-    await db.query(`CREATE TABLE "account" ("id" character varying NOT NULL, "total_stake" numeric NOT NULL, "total_stake_reward" numeric NOT NULL, "total_owner_reward" numeric NOT NULL, CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "account" ("id" character varying NOT NULL, "identity_display" text, "identity_level" character varying(10) NOT NULL, "total_stake" numeric NOT NULL, "total_stake_reward" numeric NOT NULL, "total_owner_reward" numeric NOT NULL, CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id"))`)
     await db.query(`ALTER TABLE "stake_pool_stake" ADD CONSTRAINT "FK_07bc33fb01c008a2251f20bdab2" FOREIGN KEY ("account_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "stake_pool_stake" ADD CONSTRAINT "FK_5647459f5175b49a3eb5a53a433" FOREIGN KEY ("stake_pool_id") REFERENCES "stake_pool"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     await db.query(`ALTER TABLE "miner" ADD CONSTRAINT "FK_737c656afd5d25141ddadb45dc5" FOREIGN KEY ("stake_pool_id") REFERENCES "stake_pool"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
