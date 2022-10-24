@@ -18,6 +18,7 @@ import {
   getAccount,
   getStakePool,
   max,
+  removeDust,
   updateWorkerShare,
   updateWorkerSMinAndSMax,
 } from './utils/common'
@@ -288,13 +289,18 @@ const processSerializedEvents = async (
         )
       }
     } else if (name === 'PhalaStakePool.Withdrawal') {
-      const {stakePoolId, accountId, amount, shares} = params
+      const {stakePoolId, accountId} = params
+      let {amount, shares} = params
       const account = getAccount(accounts, accountId)
       const stakePool = stakePools.get(stakePoolId)
       const stakePoolStakeId = combineIds(stakePoolId, accountId)
       const stakePoolStake = stakePoolStakes.get(stakePoolStakeId)
       assert(stakePool)
       assert(stakePoolStake)
+      if (removeDust(stakePoolStake.shares.minus(shares)).eq(0)) {
+        amount = stakePoolStake.amount
+        shares = stakePoolStake.shares
+      }
       account.totalStake = account.totalStake.minus(amount)
       globalState.totalStake = globalState.totalStake.minus(amount)
       stakePool.totalShares = stakePool.totalShares.minus(shares)
