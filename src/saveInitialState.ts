@@ -24,7 +24,7 @@ import {
   updateWorkerShare,
   updateWorkerSMinAndSMax,
 } from './utils/common'
-import {fromBits, JsonBigInt, toBalance} from './utils/converters'
+import {fromBits, JsonBigInt, toBalance, toBigDecimal} from './utils/converters'
 
 type IdentityInfo = {raw: string} | {none: null}
 
@@ -53,6 +53,7 @@ interface StakePoolDump {
   totalStake: JsonBigInt
   releasingStake: JsonBigInt
   totalShares: JsonBigInt
+  rewardAcc: JsonBigInt
   workers: string[]
   withdrawQueue: Array<{
     user: string
@@ -85,6 +86,7 @@ type StakePoolStakeDump = [
   {
     shares: JsonBigInt
     availableRewards: JsonBigInt
+    rewardDebt: JsonBigInt
   }
 ]
 
@@ -130,6 +132,7 @@ const saveInitialState = async (
   })
   const accounts = new Map<string, Account>()
   const stakePools = new Map<string, StakePool>()
+  const stakePoolRewardAcc = new Map<string, JsonBigInt>()
   const stakePoolStakes = new Map<string, StakePoolStake>()
   const workers = new Map<string, Worker>(
     workersDump.map((w) => {
@@ -186,6 +189,7 @@ const saveInitialState = async (
     const totalStake = toBalance(s.totalStake)
     owner.totalOwnerReward = owner.totalOwnerReward.plus(ownerReward)
     globalState.totalStake = globalState.totalStake.plus(totalStake)
+    stakePoolRewardAcc.set(stakePoolId, s.rewardAcc)
 
     const stakePool = new StakePool({
       id: stakePoolId,
@@ -233,8 +237,17 @@ const saveInitialState = async (
       ? shares
       : shares.div(totalShares).times(totalStake).round(12, 0)
     const availableReward = toBalance(s.availableRewards)
+    const rewardAcc = stakePoolRewardAcc.get(stakePoolId)
+    assert(rewardAcc !== undefined)
+    const pendingReward = toBigDecimal(s.shares)
+      .times(fromBits(rewardAcc))
+      .minus(BigInt(s.rewardDebt))
+      .div(1e12)
+      .round(12, 0)
     account.totalStake = account.totalStake.plus(amount)
-    account.totalStakeReward = account.totalStakeReward.plus(availableReward)
+    account.totalStakeReward = account.totalStakeReward
+      .plus(availableReward)
+      .plus(pendingReward)
     if (shares.gt(0)) {
       stakePool.activeStakeCount++
     }
@@ -244,7 +257,7 @@ const saveInitialState = async (
       stakePool,
       amount,
       shares,
-      reward: availableReward,
+      reward: availableReward.plus(pendingReward),
       withdrawalAmount: BigDecimal(0),
       withdrawalShares: BigDecimal(0),
     })
