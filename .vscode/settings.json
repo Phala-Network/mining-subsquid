@@ -1,0 +1,20 @@
+{
+  "cSpell.ignoreWords": [
+    "subsquid",
+    "typeorm",
+    "phala",
+    "staker",
+    "stakers",
+    "tokenomic"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": true,
+    "source.fixAll.eslint": true,
+    "source.sortImports": true
+  },
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "typescript.tsdk": "./node_modules/typescript/lib"
+}

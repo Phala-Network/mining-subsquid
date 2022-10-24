@@ -1,0 +1,113 @@
+type GlobalState @entity {
+  id: ID! # constant 0
+  height: Int!
+  totalStake: BigDecimal!
+  lastRecordedBlockHeight: Int! # for average block time calculation
+  lastRecordedBlockTime: DateTime! # for average block time calculation
+  averageBlockTime: Int! # in milliseconds during 100 blocks at least
+  miningWorkerShare: BigDecimal!
+}
+
+type TokenomicParameters @entity {
+  id: ID! # constant 0
+  phaRate: BigDecimal!
+  budgetPerBlock: BigDecimal!
+  vMax: BigDecimal!
+  treasuryRatio: BigDecimal!
+  re: BigDecimal!
+  k: BigDecimal!
+}
+
+type Account @entity {
+  id: ID! # Account address
+  totalStake: BigDecimal!
+  totalStakeReward: BigDecimal!
+  totalOwnerReward: BigDecimal!
+  ownedStakePools: [StakePool!] @derivedFrom(field: "owner")
+  whitelistedStakePools: [StakePoolWhitelist!] @derivedFrom(field: "account")
+  stakes: [StakePoolStake!] @derivedFrom(field: "account")
+}
+
+type Worker @entity {
+  id: ID! # Worker public key
+  stakePool: StakePool
+  miner: Miner
+  confidenceLevel: Int!
+  initialScore: Int
+  sMin: BigDecimal
+  sMax: BigDecimal
+  share: BigDecimal
+}
+
+enum MinerState {
+  Ready
+  MiningIdle
+  MiningUnresponsive
+  MiningCoolingDown
+}
+
+type Miner @entity {
+  id: ID! # Miner account address
+  isBound: Boolean!
+  stakePool: StakePool
+  worker: Worker
+  stake: BigDecimal!
+  state: MinerState!
+  v: BigDecimal!
+  ve: BigDecimal!
+  pInit: Int!
+  pInstant: Int!
+  totalReward: BigDecimal!
+  coolingDownStartTime: DateTime
+}
+
+interface BasePool {
+  id: ID!
+  pid: BigInt!
+  owner: Account!
+  commission: BigDecimal!
+}
+
+type StakePool implements BasePool @entity {
+  id: ID! # StakePool pid
+  pid: BigInt! @unique # BigInt id for sorting
+  owner: Account!
+  commission: BigDecimal!
+  capacity: BigDecimal
+  delegable: BigDecimal
+  freeStake: BigDecimal!
+  releasingStake: BigDecimal!
+  totalStake: BigDecimal!
+  totalShares: BigDecimal!
+  ownerReward: BigDecimal!
+  activeStakeCount: Int!
+  workerCount: Int!
+  miningWorkerCount: Int!
+  miningWorkerShare: BigDecimal!
+  aprBase: BigDecimal!
+  totalWithdrawal: BigDecimal!
+  whitelistEnabled: Boolean!
+  stakes: [StakePoolStake!] @derivedFrom(field: "stakePool")
+  workers: [Worker!] @derivedFrom(field: "stakePool")
+  miners: [Miner!] @derivedFrom(field: "stakePool")
+  whitelists: [StakePoolWhitelist!] @derivedFrom(field: "stakePool")
+}
+
+type StakePoolStake @entity {
+  id: ID! # `${stakePool.id}-${account.id}`
+  account: Account!
+  stakePool: StakePool!
+  amount: BigDecimal!
+  shares: BigDecimal!
+  reward: BigDecimal!
+  withdrawalAmount: BigDecimal!
+  withdrawalShares: BigDecimal!
+  withdrawalStartTime: DateTime
+}
+
+type StakePoolWhitelist @entity {
+  id: ID!
+  account: Account!
+  stakePool: StakePool!
+  createTime: DateTime!
+}

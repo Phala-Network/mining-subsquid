@@ -1,0 +1,46 @@
+{
+  "$schema": "node_modules/@subsquid/substrate-typegen/src/config.schema.json",
+  "outDir": "src/types",
+  "specVersions": "https://khala.archive.subsquid.io/graphql",
+  "events": [
+    "Identity.IdentitySet",
+    "Identity.IdentityCleared",
+    "Identity.JudgementGiven",
+
+    "PhalaStakePool.PoolCreated",
+    "PhalaStakePool.PoolCommissionSet",
+    "PhalaStakePool.PoolCapacitySet",
+    "PhalaStakePool.PoolWorkerAdded",
+    "PhalaStakePool.PoolWorkerRemoved",
+    "PhalaStakePool.MiningStarted",
+    "PhalaStakePool.RewardReceived",
+    "PhalaStakePool.Contribution",
+    "PhalaStakePool.Withdrawal",
+    "PhalaStakePool.WithdrawalQueued",
+    "PhalaStakePool.RewardsWithdrawn",
+    "PhalaStakePool.OwnerRewardsWithdrawn",
+    "PhalaStakePool.StakerRewardsWithdrawn",
+    "PhalaStakePool.PoolWhitelistCreated",
+    "PhalaStakePool.PoolWhitelistDeleted",
+    "PhalaStakePool.PoolWhitelistStakerAdded",
+    "PhalaStakePool.PoolWhitelistStakerRemoved",
+
+    "PhalaMining.MinerStarted",
+    "PhalaMining.MinerStopped",
+    "PhalaMining.MinerReclaimed",
+    "PhalaMining.MinerBound",
+    "PhalaMining.MinerUnbound",
+    "PhalaMining.MinerEnterUnresponsive",
+    "PhalaMining.MinerExitUnresponsive",
+    "PhalaMining.MinerSettled",
+    "PhalaMining.BenchmarkUpdated",
+    "PhalaMining.TokenomicParametersChanged",
+
+    "PhalaRegistry.WorkerAdded",
+    "PhalaRegistry.WorkerUpdated",
+    "PhalaRegistry.InitialScoreSet"
+  ],
+  "calls": [],
+  "constants": [],
+  "storage": ["Identity.IdentityOf", "PhalaMining.TokenomicParameters"]
+}
