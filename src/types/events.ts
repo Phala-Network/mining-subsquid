@@ -1487,3 +1487,47 @@ export class PhalaStakePoolWithdrawalQueuedEvent {
     return this._chain.decodeEvent(this.event)
   }
 }
+
+export class PhalaStakePoolWorkerReclaimedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'PhalaStakePool.WorkerReclaimed')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   * A worker is reclaimed from the pool
+   */
+  get isV1150(): boolean {
+    return this._chain.getEventHash('PhalaStakePool.WorkerReclaimed') === '3eddad70bc8df6b13283af1a5095e74f20ea2ecaeb63ab0291ae1f7f937c817b'
+  }
+
+  /**
+   * A worker is reclaimed from the pool
+   */
+  get asV1150(): {pid: bigint, worker: Uint8Array} {
+    assert(this.isV1150)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A worker is reclaimed from the pool
+   */
+  get isV1183(): boolean {
+    return this._chain.getEventHash('PhalaStakePool.WorkerReclaimed') === 'de7349efda8e51303192fa1219baf30150cf4357bf18d4020b13d0784bbafcf7'
+  }
+
+  /**
+   * A worker is reclaimed from the pool
+   */
+  get asV1183(): {pid: bigint, worker: Uint8Array, originalStake: bigint} {
+    assert(this.isV1183)
+    return this._chain.decodeEvent(this.event)
+  }
+}

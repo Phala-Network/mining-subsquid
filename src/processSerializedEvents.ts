@@ -52,7 +52,8 @@ const processSerializedEvents = async (
       name === 'PhalaStakePool.RewardReceived' ||
       name === 'PhalaStakePool.RewardsWithdrawn' ||
       name === 'PhalaStakePool.OwnerRewardsWithdrawn' ||
-      name === 'PhalaStakePool.StakerRewardsWithdrawn'
+      name === 'PhalaStakePool.StakerRewardsWithdrawn' ||
+      name === 'PhalaStakePool.WorkerReclaimed'
     ) {
       stakePoolIds.add(params.stakePoolId)
     }
@@ -425,6 +426,12 @@ const processSerializedEvents = async (
       const stakeReward = stakePoolStake.reward
       account.totalStakeReward = account.totalStakeReward.minus(stakeReward)
       stakePoolStake.reward = BigDecimal(0)
+    } else if (name === 'PhalaStakePool.WorkerReclaimed') {
+      const {stakePoolId, amount} = params
+      const stakePool = stakePools.get(stakePoolId)
+      assert(stakePool)
+      stakePool.releasingStake = stakePool.releasingStake.minus(amount)
+      stakePool.freeStake = stakePool.freeStake.plus(amount)
     } else if (name === 'PhalaStakePool.PoolWhitelistCreated') {
       const {stakePoolId} = params
       const stakePool = stakePools.get(stakePoolId)
@@ -634,14 +641,6 @@ const processSerializedEvents = async (
       miner.state = MinerState.Ready
       miner.coolingDownStartTime = null
       miner.stake = BigDecimal(0)
-      try {
-        assert(miner.stakePool)
-        const stakePool = getStakePool(stakePools, miner.stakePool)
-        stakePool.releasingStake = stakePool.releasingStake.minus(miner.stake)
-        stakePool.freeStake = stakePool.freeStake.plus(miner.stake)
-      } catch (e) {
-        // Ignore stake pool free and releasing stake update error
-      }
     } else if (name === 'PhalaRegistry.WorkerAdded') {
       const {workerId, confidenceLevel} = params
       const worker = new Worker({id: workerId, confidenceLevel})

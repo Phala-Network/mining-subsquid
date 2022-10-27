@@ -34,6 +34,7 @@ import {
   PhalaStakePoolStakerRewardsWithdrawnEvent,
   PhalaStakePoolWithdrawalEvent,
   PhalaStakePoolWithdrawalQueuedEvent,
+  PhalaStakePoolWorkerReclaimedEvent,
 } from './types/events'
 import {encodeAddress, fromBits, toBalance} from './utils/converters'
 
@@ -170,6 +171,16 @@ const serializeEvents = (ctx: Ctx): SerializedEvent[] => {
             stakePoolId: String(pid),
             accountId: encodeAddress(user),
             amount: toBalance(amount),
+          },
+        }
+      } else if (item.name === 'PhalaStakePool.WorkerReclaimed') {
+        const e = new PhalaStakePoolWorkerReclaimedEvent(ctx, item.event)
+        const {pid, originalStake} = e.asV1183
+        baseEvent = {
+          name: item.name,
+          params: {
+            stakePoolId: String(pid),
+            amount: toBalance(originalStake),
           },
         }
       } else if (item.name === 'PhalaStakePool.PoolWhitelistStakerAdded') {

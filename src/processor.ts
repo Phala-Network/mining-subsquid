@@ -35,6 +35,7 @@ const processor = new SubstrateBatchProcessor()
   .addEvent('PhalaStakePool.StakerRewardsWithdrawn', {
     data: {event: {args: true}},
   })
+  .addEvent('PhalaStakePool.WorkerReclaimed', {data: {event: {args: true}}})
   .addEvent('PhalaStakePool.PoolWhitelistCreated', {
     data: {event: {args: true}},
   })
@@ -135,6 +136,10 @@ export type BaseSerializedEvent =
   | {
       name: 'PhalaStakePool.StakerRewardsWithdrawn'
       params: {stakePoolId: string; accountId: string; amount: BigDecimal}
+    }
+  | {
+      name: 'PhalaStakePool.WorkerReclaimed'
+      params: {stakePoolId: string; amount: BigDecimal}
     }
   | {name: 'PhalaStakePool.PoolWhitelistCreated'; params: {stakePoolId: string}}
   | {name: 'PhalaStakePool.PoolWhitelistDeleted'; params: {stakePoolId: string}}

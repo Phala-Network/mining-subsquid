@@ -20,6 +20,7 @@
     "PhalaStakePool.RewardsWithdrawn",
     "PhalaStakePool.OwnerRewardsWithdrawn",
     "PhalaStakePool.StakerRewardsWithdrawn",
+    "PhalaStakePool.WorkerReclaimed",
     "PhalaStakePool.PoolWhitelistCreated",
     "PhalaStakePool.PoolWhitelistDeleted",
     "PhalaStakePool.PoolWhitelistStakerAdded",
