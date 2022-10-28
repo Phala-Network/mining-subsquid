@@ -300,18 +300,13 @@ const processSerializedEvents = async (
         )
       }
     } else if (name === 'PhalaStakePool.Withdrawal') {
-      const {stakePoolId, accountId} = params
-      let {amount, shares} = params
+      const {stakePoolId, accountId, amount, shares} = params
       const account = getAccount(accounts, accountId)
       const stakePool = stakePools.get(stakePoolId)
       const stakePoolStakeId = combineIds(stakePoolId, accountId)
       const stakePoolStake = stakePoolStakes.get(stakePoolStakeId)
       assert(stakePool)
       assert(stakePoolStake)
-      if (removeDust(stakePoolStake.shares.minus(shares)).eq(0)) {
-        amount = stakePoolStake.amount
-        shares = stakePoolStake.shares
-      }
       account.totalStake = account.totalStake.minus(amount)
       globalState.totalStake = globalState.totalStake.minus(amount)
       stakePool.totalShares = stakePool.totalShares.minus(shares)
@@ -322,15 +317,14 @@ const processSerializedEvents = async (
             .times(BigDecimal(1).minus(stakePool.commission))
             .div(stakePool.totalStake)
       stakePool.freeStake = stakePool.freeStake.minus(amount)
-      stakePoolStake.shares = stakePoolStake.shares.minus(shares)
-      stakePoolStake.amount = stakePoolStake.amount.minus(amount)
+      stakePoolStake.shares = removeDust(stakePoolStake.shares.minus(shares))
+      stakePoolStake.amount = removeDust(stakePoolStake.amount.minus(amount))
       if (stakePoolStake.shares.eq(0)) {
         stakePool.activeStakeCount--
       }
       if (stakePool.totalWithdrawal.gt(0)) {
-        stakePool.totalWithdrawal = max(
-          stakePool.totalWithdrawal.minus(amount),
-          BigDecimal(0)
+        stakePool.totalWithdrawal = removeDust(
+          stakePool.totalWithdrawal.minus(amount)
         )
       }
       if (stakePool.capacity != null) {
@@ -339,15 +333,13 @@ const processSerializedEvents = async (
           .plus(stakePool.totalWithdrawal)
       }
       if (stakePoolStake.withdrawalShares.gt(0)) {
-        stakePoolStake.withdrawalShares = max(
-          stakePoolStake.withdrawalShares.minus(shares),
-          BigDecimal(0)
+        stakePoolStake.withdrawalShares = removeDust(
+          stakePoolStake.withdrawalShares.minus(shares)
         )
       }
       if (stakePoolStake.withdrawalAmount.gt(0)) {
-        stakePoolStake.withdrawalAmount = max(
-          stakePoolStake.withdrawalAmount.minus(amount),
-          BigDecimal(0)
+        stakePoolStake.withdrawalAmount = removeDust(
+          stakePoolStake.withdrawalAmount.minus(amount)
         )
       }
     } else if (name === 'PhalaStakePool.WithdrawalQueued') {
