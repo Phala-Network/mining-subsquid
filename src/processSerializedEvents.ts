@@ -298,6 +298,7 @@ const processSerializedEvents = async (
             withdrawalShares: BigDecimal(0),
           })
         )
+        stakePool.activeStakeCount++
       }
     } else if (name === 'PhalaStakePool.Withdrawal') {
       const {stakePoolId, accountId, amount, shares} = params
@@ -555,10 +556,10 @@ const processSerializedEvents = async (
         stakePool.aprBase = stakePool.miningWorkerShare
           .times(BigDecimal(1).minus(stakePool.commission))
           .div(stakePool.totalStake)
+        stakePool.miningWorkerCount--
       }
       miner.state = MinerState.MiningCoolingDown
       miner.coolingDownStartTime = blockTime
-      stakePool.miningWorkerCount--
       stakePool.releasingStake = stakePool.releasingStake.plus(miner.stake)
     } else if (name === 'PhalaMining.BenchmarkUpdated') {
       const {minerId, pInstant} = params
