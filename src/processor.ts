@@ -15,7 +15,6 @@ import updateAverageBlockTime from './updateAverageBlockTime'
 
 const processor = new SubstrateBatchProcessor()
   .setBlockRange(config.blockRange)
-  .setBatchSize(config.batchSize)
   .setDataSource(config.dataSource)
   // PhalaStakePool
   .addEvent('PhalaStakePool.PoolCreated', {data: {event: {args: true}}})
