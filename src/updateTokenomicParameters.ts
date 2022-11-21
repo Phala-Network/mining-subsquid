@@ -15,7 +15,7 @@ const updateTokenomicParameters = async (
   const tokenomicParameters = new TokenomicParameters({
     id: '0',
     phaRate: fromBits(value.phaRate),
-    budgetPerBlock: fromBits(value.budgetPerBlock),
+    budgetPerBlock: fromBits(value.budgetPerBlock).mul(0.75),
     vMax: fromBits(value.vMax),
     treasuryRatio: fromBits(value.treasuryRatio),
     re: fromBits(value.re),
