@@ -18,7 +18,6 @@ import {
   combineIds,
   getAccount,
   getStakePool,
-  max,
   removeDust,
   updateWorkerShare,
   updateWorkerSMinAndSMax,

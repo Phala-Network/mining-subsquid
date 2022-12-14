@@ -9,8 +9,10 @@ const config: {
   blockRange: {from: START_BLOCK_HEIGHT},
   dataSource: {
     archive: lookupArchive('khala', {release: 'FireSquid'}),
-    chain: 'wss://khala-archive.phala.network/ws',
+    chain: 'wss://priv-api.phala.network/khala/ws',
   },
 }
+
+console.log(config.dataSource.archive)
 
 export default config
